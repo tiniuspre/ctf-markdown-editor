@@ -1,0 +1,54 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body styling */
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    text-align: center;
+    color: #333;
+    font-size: 18px;
+}
+
+/* Welcome message */
+body::before {
+    content: "Welcome!";
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Links styling */
+a {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+a:hover {
+    background-color: #0056b3;
+}
+
+/* Link for Logout */
+a[href="/logout"] {
+    background-color: #dc3545;
+}
+
+a[href="/logout"]:hover {
+    background-color: #c82333;
+}

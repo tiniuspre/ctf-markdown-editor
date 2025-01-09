@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=backend/app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - SECRET_KEY=CHANGE_ME
+      - ADMIN_PASSWORD=CHANGE_ME
+      - FLAG=flag{this_is_a_flag}

@@ -1,0 +1,96 @@
+<!-- Update the `frontend/profile.html` template -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <h1>Welcome {{ current_user.username }}!</h1>
+    <a href="/logout">Logout</a>
+
+    {% if not is_admin %}
+    <h2>Markdown Editor</h2>
+    <form method="POST" action="/profile">
+        <textarea id="markdown-input" name="markdown" rows="10" cols="50"></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+    {% endif %}
+
+    <h2>Rendered Markdown</h2>
+    <div id="markdown-output">{{ rendered_markdown|safe }}</div>
+
+    <!-- Chat Bubble -->
+    <div id="chat-container" style="position: fixed; bottom: 0; left: 0; margin: 20px; width: 300px;">
+        <div id="chatbox" style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; background-color: white; max-height: 300px; overflow-y: auto;">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div style="display: flex; margin-top: 10px;">
+            <input type="text" id="user-input" placeholder="Type your message..." style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+            <button id="send-button" style="margin-left: 10px; padding: 10px; border: none; background-color: #007bff; color: white; border-radius: 5px;">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('markdown-input').addEventListener('input', function () {
+            var markdownText = this.value;
+            document.getElementById('markdown-output').innerHTML = marked(markdownText);
+        });
+
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        async function sendMessage() {
+            let userMessage = userInput.value.trim();
+            if (userMessage === "") return;
+
+            // Display user message
+            const userBubble = document.createElement('div');
+            userBubble.style.textAlign = 'right';
+            userBubble.innerHTML = `<p style="background-color: #007bff; color: white; padding: 8px; border-radius: 5px; max-width: 70%; display: inline-block;">${userMessage}</p>`;
+            chatbox.appendChild(userBubble);
+
+            // Scroll chatbox to the bottom
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            // Send message to the backend
+            const response = await fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            const data = await response.json();
+            const robotMessage = data.response;
+
+            // Display robot message
+            const robotBubble = document.createElement('div');
+            robotBubble.style.textAlign = 'left';
+            robotBubble.innerHTML = `<p style="background-color: #e9ecef; padding: 8px; border-radius: 5px; max-width: 70%; display: inline-block;">${robotMessage}</p>`;
+            chatbox.appendChild(robotBubble);
+
+            userInput.value = "";
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>
